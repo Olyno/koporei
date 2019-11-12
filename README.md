@@ -7,9 +7,11 @@ Koporei is an easy router for any [Express](https://expressjs.com) or [Koa](http
 ```
 Pages
 |- abc
-    |- hey.html        <----- GET /abc/hey
-|- hola.html           <----- GET /hola
-|- index.html          <----- GET /
+    |- hey.html        <----- GET  /abc/hey
+    |- hey.js          <----- POST /abc/hey
+|- test.js             <----- POST /test
+|- hola.html           <----- GET  /hola
+|- index.html          <----- GET  /
 ```
 
 ## Install
