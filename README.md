@@ -31,7 +31,7 @@ yarn add koporei
 
 Create a ``koporei.json`` at the root dir of your project. This file should contain a configuration.
 
-```json
+```js
 {
     // The path to the directory where your html pages are.
     // Default: src/pages
