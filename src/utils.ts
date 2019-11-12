@@ -2,6 +2,13 @@ import fs from 'fs';
 
 const format: string = '[koperei] %msg%';
 
+export function isUndefined(obj: any): boolean {
+    for (const value of obj) {
+        if (typeof value !== 'undefined') { return true; }
+    }
+    return false;
+}
+
 export async function findPackage(path: string): Promise<string> {
     return new Promise((resolve, rejects) => {
         fs.readdir(path, (err, files) => {

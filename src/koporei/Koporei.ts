@@ -42,9 +42,9 @@ export async function initRoute(
                     }
                     if (path.extname(file) === '.js') {
                         const callback = require(filePath).default;
-                        new KopereiRoute('POST', requestPath, callback);
+                        new KopereiRoute(requestPath, { 'POST': callback });
                     } else {
-                        new KopereiRoute('GET', requestPath, filePath);
+                        new KopereiRoute(requestPath, { 'GET': filePath });
                     }
                 } else {
                     resolve(initRoute(configDir, filePath));

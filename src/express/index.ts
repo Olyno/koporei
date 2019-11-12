@@ -11,9 +11,9 @@ export default (opts?: KoporeiConfig) => {
         );
         if (result.length > 0) {
             if (req.method.toUpperCase() === 'GET') {
-                return res.sendFile(result[0].filePath as string);
+                return res.sendFile(result[0].method.GET as string);
             } else if (req.method.toUpperCase() === 'POST') {
-                const callback: Function = result[0].filePath as Function;
+                const callback: Function = result[0].method.POST as Function;
                 return callback(req, res, req.body);
             }
         }

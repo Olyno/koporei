@@ -13,9 +13,9 @@ export default (opts?: KoporeiConfig) => {
         if (result.length > 0) {
             if (ctx.method.toUpperCase() === 'GET') {
                 ctx.type = 'html';
-                ctx.body = createReadStream(result[0].filePath as string);
+                ctx.body = createReadStream(result[0].method.GET as string);
             } else if (ctx.method.toUpperCase() === 'POST') {
-                const callback: Function = result[0].filePath as Function;
+                const callback: Function = result[0].method.POST as Function;
                 // @ts-ignore
                 callback(ctx, ctx.request.body);
             }
