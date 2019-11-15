@@ -15,7 +15,7 @@ class KoporeiRoute {
         this.method = method;
         this.path = path;
         if (isUndefined(method)) {
-            throw error('A KoporeiMethod must contains a value');
+            throw error('A KoporeiMethod must contains a method!');
         }
         if (sameRoute) {
             Object.assign((routes.filter(route => route.path === path)[0] || this).method, method);
