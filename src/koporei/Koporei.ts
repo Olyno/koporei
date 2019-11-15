@@ -21,14 +21,14 @@ export async function initRoute(
                 currentDir === configDir
                     ? '/'
                     : currentDir
-                          .replace(
-                              new RegExp(
-                                  configDir.replace(/\\/gi, '\\\\'),
-                                  'gi',
-                              ),
-                              '',
-                          )
-                          .replace(/\\/g, '/');
+                            .replace(
+                                new RegExp(
+                                    configDir.replace(/\\/gi, '\\\\'),
+                                    'gi',
+                                ),
+                                ''
+                            )
+                           .replace(/\\/g, '/');
             for (const file of files) {
                 const filePath = path.resolve(currentDir, file);
                 if (fs.lstatSync(filePath).isFile()) {
