@@ -1,8 +1,10 @@
 import fs from 'fs';
 import path from 'path';
-import { error, findPackage } from '../utils';
-import KoporeiConfig from './KoporeiConfig';
+import { error } from '../utils';
+import IKoporeiConfig from './KoporeiConfig';
 import KopereiRoute from './KoporeiRoute';
+
+let config: IKoporeiConfig;
 
 function withoutExtension(text: string): string {
     return text.replace(/\.\w+$/gi, '');
@@ -20,10 +22,10 @@ export async function initRoute(
             const currentPath: string =
                 currentDir === configDir
                     ? '/'
-                    : currentDir
+                    : path.normalize(currentDir)
                             .replace(
                                 new RegExp(
-                                    configDir.replace(/\\/gi, '\\\\'),
+                                    path.normalize(configDir).replace(/\\/gi, '\\\\'),
                                     'gi',
                                 ),
                                 ''
@@ -32,6 +34,7 @@ export async function initRoute(
             for (const file of files) {
                 const filePath = path.resolve(currentDir, file);
                 if (fs.lstatSync(filePath).isFile()) {
+                    const sourceCode: string = fs.readFileSync(filePath).toString();
                     let requestPath: string;
                     if (withoutExtension(path.basename(file)) !== 'index') {
                         requestPath = `${
@@ -40,12 +43,20 @@ export async function initRoute(
                     } else {
                         requestPath = currentPath;
                     }
-                    if (path.extname(file) === '.js') {
-                        const callback = require(filePath).default;
-                        new KopereiRoute(requestPath, { 'POST': callback });
-                    } else {
-                        new KopereiRoute(requestPath, { 'GET': filePath });
+
+                    if (config.isLowerCase) {
+                        requestPath = requestPath.toLowerCase();
                     }
+
+                    if (path.extname(file) === '.js') {
+                        const callback = require(filePath).default || require(filePath);
+                        new KopereiRoute(requestPath, { 'POST': callback });
+                    } else if (path.extname(file) === '.html') {
+                        new KopereiRoute(requestPath, { 'GET': sourceCode });
+                    } else {
+                        throw error('This file is not reconized: ' + file);
+                    }
+
                 } else {
                     resolve(initRoute(configDir, filePath));
                 }
@@ -55,36 +66,10 @@ export async function initRoute(
     });
 }
 
-export default async function(opts?: KoporeiConfig) {
-    const rootModule: NodeModule | undefined =
-        require.main || process.mainModule;
-    if (rootModule) {
-        const rootFile = rootModule.filename;
-        findPackage(path.dirname(rootFile))
-            .then(rootPath => {
-                rootPath = path.resolve(rootPath);
-
-                if (fs.existsSync(rootPath + '/koporei.json')) {
-                    const fileData: KoporeiConfig =
-                        opts ||
-                        JSON.parse(
-                            fs
-                                .readFileSync(rootPath + '/koporei.json')
-                                .toString(),
-                        );
-                    fileData.pages = path.resolve(
-                        rootPath,
-                        fileData.pages || 'src/pages',
-                    );
-
-                    initRoute(fileData.pages, fileData.pages);
-                } else {
-                    throw error("Can't find the kopeirei config file.");
-                }
-            })
-            .catch(err => {
-                throw error(err);
-            });
+export default async function(opts?: IKoporeiConfig) {
+    if (opts?.pages) {
+        config = opts;
+        initRoute(opts.pages, opts.pages);
     } else {
         throw error("Can't find root path.");
     }

@@ -11,7 +11,7 @@
 		"lib": ["esnext", "es2015", "dom"],
 		"allowJs": false
 	},
-	"include": ["src", "tests/*.ts"],
+	"include": ["src"],
 	"exclude": [
 		"node_modules",
 		"dist"

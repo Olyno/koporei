@@ -1,8 +1,13 @@
 import KoaApp from 'koa';
-import koa from '../src/koa';
+import { koa } from '../src';
+import IKoporeiConfig from '../src/koporei/KoporeiConfig';
 
 const app = new KoaApp();
 
-app.use(koa());
+const options: IKoporeiConfig = {
+    pages: __dirname + '/./pages'
+}
 
-app.listen(3000);
+app.use(koa(options));
+
+app.listen(3000, () => console.log('> Server listening at http://localhost:3000'));

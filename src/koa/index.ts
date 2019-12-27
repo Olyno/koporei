@@ -1,4 +1,3 @@
-import { createReadStream } from 'fs';
 import { Context } from 'koa';
 import Koporei from '../koporei/Koporei';
 import KoporeiConfig from '../koporei/KoporeiConfig';
@@ -13,11 +12,14 @@ export default (opts?: KoporeiConfig) => {
         if (result.length > 0) {
             if (ctx.method.toUpperCase() === 'GET') {
                 ctx.type = 'html';
-                ctx.body = createReadStream(result[0].method.GET as string);
+                ctx.body = result[0].method.GET as string;
             } else if (ctx.method.toUpperCase() === 'POST') {
-                const callback: Function = result[0].method.POST as Function;
-                // @ts-ignore
-                callback(ctx, ctx.request.body);
+                if (result[0].method.POST) {
+                    const callback: 
+                        (ctx: Context, next) => Promise<void> | void
+                            = result[0].method.POST;
+                    return callback(ctx, next);
+                }
             }
         }
         next();

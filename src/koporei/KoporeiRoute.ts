@@ -1,16 +1,16 @@
 import { error, isUndefined } from '../utils';
 
-interface KoporeiMethod {
+interface IKoporeiMethod {
     GET?: string | undefined;
-    POST?: Function | undefined;
+    POST?: ((req, res, next) => Promise<void> | void) & ((ctx, next) => Promise<void> | void);
 }
 
 class KoporeiRoute {
 
     public path: string;
-    public method: KoporeiMethod;
+    public method: IKoporeiMethod;
 
-    constructor(path: string, method: KoporeiMethod) {
+    constructor(path: string, method: IKoporeiMethod) {
         const sameRoute: KoporeiRoute = routes.filter(route => route.path === path)[0];
         this.method = method;
         this.path = path;

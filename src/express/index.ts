@@ -11,10 +11,14 @@ export default (opts?: KoporeiConfig) => {
         );
         if (result.length > 0) {
             if (req.method.toUpperCase() === 'GET') {
-                return res.sendFile(result[0].method.GET as string);
+                return res.send(result[0].method.GET as string);
             } else if (req.method.toUpperCase() === 'POST') {
-                const callback: Function = result[0].method.POST as Function;
-                return callback(req, res, req.body);
+                if (result[0].method.POST) {
+                    const callback:
+                        (req: Request, res: Response, next) => Promise<void> | void
+                            = result[0].method.POST;
+                    return callback(req, res, next);
+                }
             }
         }
         return next();

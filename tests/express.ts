@@ -1,8 +1,13 @@
 import ExpressApp from 'express';
-import express from '../src/express';
+import { express } from '../src';
+import IKoporeiConfig from '../src/koporei/KoporeiConfig';
 
 const app = ExpressApp();
 
-app.use(express());
+const options: IKoporeiConfig = {
+    pages: __dirname + '/./pages'
+}
+
+app.use(express(options));
 
 app.listen(3000);

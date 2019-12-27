@@ -29,17 +29,7 @@ yarn add koporei
 
 ## Usage
 
-Create a ``koporei.json`` at the root dir of your project. This file should contain a configuration.
-
-```js
-{
-    // The path to the directory where your html pages are.
-    // Default: src/pages
-    "pages": "tests/pages"
-}
-```
-
-After that, add Koporei as middleware:
+Add Koporei as middleware:
 
 **Express:**
 
@@ -49,7 +39,11 @@ import { express } from 'koporei';
 
 const app = ExpressApp();
 
-app.use(express());
+const options = {
+    pages: __dirname + '../src/pages'
+}
+
+app.use(express(options));
 
 app.listen(3000);
 ```
@@ -62,9 +56,33 @@ import { koa } from 'koporei';
 
 const app = new KoaApp();
 
-app.use(koa());
+const options = {
+    pages: __dirname + '../src/pages'
+}
+
+app.use(koa(options));
 
 app.listen(3000);
+```
+
+**Configuration:**
+
+```js
+const options = {
+    // Where your pages are
+    pages: __dirname + '../src/pages',
+
+    // (optionnal) Make the path to lower case
+    isLowerCase: true,
+
+    // /!\ EXPERIMENTAL /!\ (not implemented yet)
+    // (optionnal) If you use React, Vue, Svelte, or other tools like that.
+    // It will compile for you files. Just precise the function it must execute.
+    // code argument is the path to the file
+    preprocessor: (code) => require('@babel/core').transform(code, {
+        presets: ['@babel/preset-react'],
+    })
+}
 ```
 
 To know: koporei should support body of requests as POST requests.
