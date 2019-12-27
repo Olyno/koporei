@@ -1,4 +1,4 @@
-import express from './express/index';
-import koa from './koa/index';
+import express from './express';
+import koa from './koa';
 
 export { express, koa };
