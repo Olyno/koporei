@@ -1,0 +1,10 @@
+{
+    "watch": [
+        "src",
+        "tests"
+    ],
+    "exec": [
+        "ts-node tests/koa"
+    ],
+    "ext": "js,ts,html,jsx,tsx"
+}
