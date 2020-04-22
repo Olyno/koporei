@@ -1,6 +1,6 @@
 {
   "name": "koporei",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Sapper-like router for Koa, Express and more!",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
@@ -18,10 +18,8 @@
     "dist"
   ],
   "scripts": {
-    "prepublishOnly": "yarn lint",
     "version": "yarn format",
     "format": "prettier --write \"src/**/*.ts\"",
-    "lint": "tslint -p tsconfig.json",
     "prepare": "npm run build",
     "build": "tsc",
     "dev": "nodemon --config nodemon/dev.json",
