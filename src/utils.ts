@@ -2,7 +2,9 @@ const format: string = '[koperei] %msg%';
 
 export function isUndefined(obj: any): boolean {
     for (const value of obj) {
-        if (typeof value !== 'undefined') { return true; }
+        if (typeof value !== 'undefined') {
+            return true;
+        }
     }
     return false;
 }
