@@ -2,8 +2,7 @@
   "name": "koporei",
   "version": "0.0.1",
   "description": "Sapper-like router for Koa, Express and more!",
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
+  "main": "dist/index.js",
   "repository": "https://github.com/Olyno/koporei",
   "author": "Olyno <https://github.com/Olyno>",
   "license": "GPL-3.0",
@@ -12,7 +11,8 @@
     "koporei",
     "router",
     "koa",
-    "express"
+    "express",
+    "sapper"
   ],
   "files": [
     "dist"
