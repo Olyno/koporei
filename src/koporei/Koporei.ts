@@ -2,7 +2,9 @@ import fs from 'fs';
 import path from 'path';
 import { error } from '../utils';
 import IKoporeiConfig from './KoporeiConfig';
-import KopereiRoute from './KoporeiRoute';
+import KoporeiRoute from './KoporeiRoute';
+import { preprocessors } from './preprocessors';
+import KoporeiHooks from './KoporeiHooks';
 
 let config: IKoporeiConfig;
 
@@ -11,71 +13,91 @@ function withoutExtension(text: string): string {
 }
 
 export async function initRoute(
-    configDir: string,
-    currentDir: string,
+	configDir: string,
+	currentDir: string,
 ): Promise<void> {
-    return new Promise((resolve, rejects) => {
-        fs.readdir(currentDir, (err, files) => {
-            if (err) {
-                throw err;
-            }
-            const currentPath: string =
-                currentDir === configDir
-                    ? '/'
-                    : path
-                          .normalize(currentDir)
-                          .replace(
-                              new RegExp(
-                                  path
-                                      .normalize(configDir)
-                                      .replace(/\\/gi, '\\\\'),
-                                  'gi',
-                              ),
-                              '',
-                          )
-                          .replace(/\\/g, '/');
-            for (const file of files) {
-                const filePath = path.resolve(currentDir, file);
-                if (fs.lstatSync(filePath).isFile()) {
-                    const sourceCode: string = fs
-                        .readFileSync(filePath)
-                        .toString();
-                    let requestPath: string;
-                    if (withoutExtension(path.basename(file)) !== 'index') {
-                        requestPath = `${
-                            currentPath !== '/' ? currentPath : ''
-                        }/${withoutExtension(file)}`;
-                    } else {
-                        requestPath = currentPath;
-                    }
+	return new Promise((resolve, rejects) => {
+		if (fs.existsSync(configDir)) {
+			fs.readdir(currentDir, (err, files) => {
+				if (err) throw err;
+				if (hooks.onLoadStart) hooks.onLoadStart();
+				for (const file of files) {
+					const filePath = path.join(currentDir, file);
+					if (fs.lstatSync(filePath).isFile()) {
+						
+						let route;
 
-                    if (config.isLowerCase) {
-                        requestPath = requestPath.toLowerCase();
-                    }
+						const routePath = withoutExtension(
+							filePath.slice(configDir.length).replace(/\\/g, '/')
+						).replace(/(index)$/g, '');
 
-                    if (path.extname(file) === '.js') {
-                        const callback =
-                            require(filePath).default || require(filePath);
-                        new KopereiRoute(requestPath, { POST: callback });
-                    } else if (path.extname(file) === '.html') {
-                        new KopereiRoute(requestPath, { GET: sourceCode });
-                    } else {
-                        throw error('This file is not reconized: ' + file);
-                    }
-                } else {
-                    resolve(initRoute(configDir, filePath));
-                }
-            }
-            resolve();
-        });
-    });
+						if (path.extname(filePath) === '.js') {
+							route = new KoporeiRoute({
+								filePath,
+								path: routePath,
+								method: {
+									name: 'POST',
+									callback: require(filePath).default || require(filePath)
+								}
+							})
+						} else {
+							const search = preprocessors.filter(p => p.extension === path.extname(filePath).replace(/^\./g, ''));
+							route = new KoporeiRoute({
+								filePath,
+								path: routePath,
+								method: {
+									name: 'GET',
+									callback: () => {
+										const f = config.isSinglePage ? path.normalize(config.isSinglePage) : filePath;
+										return fs.readFileSync(f).toString();
+									}
+								}
+							})
+							if (search.length > 0) {
+								for (const cb of search) {
+									cb.transform(route, cb.options);
+								}
+							}
+						}
+
+						if (route) {
+							routes.push(route);
+							if (config.hooks && config.hooks.onRouteAdded) config.hooks.onRouteAdded(route);
+						}
+
+					} else {
+						resolve(initRoute(configDir, filePath));
+					}
+				}
+				if (hooks.onLoadEnd) hooks.onLoadEnd();
+				resolve();
+			})
+		} else {
+			rejects('This path doesn\'t exist: ' + configDir);
+		}
+	});
 }
 
-export default async function (opts?: IKoporeiConfig) {
-    if (opts?.pages) {
-        config = opts;
-        initRoute(opts.pages, opts.pages);
-    } else {
-        throw error("Can't find root path.");
-    }
+export default async function(opts?: IKoporeiConfig) {
+	if (opts?.pages) {
+		config = {
+			...opts,
+			pages: path.join(process.cwd(), path.normalize(opts.pages)),
+		};
+		if (config.hooks) hooks = config.hooks;
+		initRoute(config.pages, config.pages)
+			.catch(err => {
+				throw err;
+			});
+	} else {
+		throw error("Can't find root path.");
+	}
 }
+
+export const routes: KoporeiRoute[] = [];
+export let hooks: KoporeiHooks = {
+	onExecute: () => {},
+	onLoadStart: () => {},
+	onLoadEnd: () => {},
+	onRouteAdded: () => {}
+};

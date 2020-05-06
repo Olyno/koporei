@@ -1,5 +1,9 @@
+import KoporeiHooks from "./KoporeiHooks";
+import KoporeiPreprocessor from "./KoporeiPreprocessor";
+
 export default interface IKoporeiConfig {
     pages: string;
-    isLowerCase?: boolean;
-    preprocessor?: (file: string) => Promise<any>;
+    isSinglePage?: string;
+    hooks?: KoporeiHooks;
+    preprocessors?: KoporeiPreprocessor[];
 }

@@ -1,36 +1,26 @@
-import { error, isUndefined } from '../utils';
+import { hooks } from "./Koporei";
 
-interface IKoporeiMethod {
-    GET?: string | undefined;
-    POST?: ((req, res, next) => Promise<void> | void) &
-        ((ctx, next) => Promise<void> | void);
+interface KoporeiRouteOpts {
+    path: string;
+    filePath: string;
+    method: { name: 'GET' | 'POST', callback: (...params) => string };
 }
 
-class KoporeiRoute {
+export default class KoporeiRoute {
+
     public path: string;
-    public method: IKoporeiMethod;
+    public filePath: string;
+    public method: { name: 'GET' | 'POST', callback: (...params) => string };
 
-    constructor(path: string, method: IKoporeiMethod) {
-        const sameRoute: KoporeiRoute = routes.filter(
-            (route) => route.path === path,
-        )[0];
-        this.method = method;
-        this.path = path;
-        if (isUndefined(method)) {
-            throw error('A KoporeiMethod must contains a method!');
-        }
-        if (sameRoute) {
-            Object.assign(
-                (routes.filter((route) => route.path === path)[0] || this)
-                    .method,
-                method,
-            );
-        } else {
-            routes.push(this);
-        }
+    constructor(opts: KoporeiRouteOpts) {
+        this.filePath = opts.filePath;
+        this.path = opts.path;
+        this.method = opts.method;
     }
+
+    execute (...params): string {
+        if (hooks.onExecute) hooks.onExecute(this);
+        return this.method.callback(...params);
+    }
+
 }
-
-export const routes: KoporeiRoute[] = [];
-
-export default KoporeiRoute;
