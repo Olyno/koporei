@@ -3,7 +3,6 @@
         "src"
     ],
     "exec": [
-        "yarn lint",
         "yarn build"
     ],
     "ext": "ts"
