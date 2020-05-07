@@ -1,6 +1,6 @@
 {
-  "name": "@koporei/core",
-  "version": "0.1.1",
+  "name": "koporei",
+  "version": "0.2.0",
   "description": "Sapper-like router for Koa, Express and more!",
   "main": "dist/index.js",
   "repository": "https://github.com/Olyno/koporei",
