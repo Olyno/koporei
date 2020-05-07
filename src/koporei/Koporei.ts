@@ -17,68 +17,75 @@ export async function initRoute(
 	currentDir: string,
 ): Promise<void> {
 	return new Promise((resolve, rejects) => {
-		if (fs.existsSync(configDir)) {
-			fs.readdir(currentDir, (err, files) => {
-				if (err) throw err;
-				if (hooks.onLoadStart) hooks.onLoadStart();
-				for (const file of files) {
-					const filePath = path.join(currentDir, file);
-					if (fs.lstatSync(filePath).isFile()) {
-						
-						let route;
+		fs.exists(configDir, exists => {
+			if (exists) {
+				fs.readdir(currentDir, (err, files) => {
+					if (err) throw err;
+					if (hooks.onLoadStart) hooks.onLoadStart();
+					for (const file of files) {
+						const filePath = path.join(currentDir, file);
+						fs.lstat(filePath, (err, stats) => {
+							if (err) return rejects(err);
+							if (stats.isFile()) {
 
-						let routePath = withoutExtension(
-							filePath.slice(configDir.length).replace(/\\/g, '/')
-						).replace(/(index)$/g, '');
-
-						if (config.isLowerCase) routePath = routePath.toLowerCase();
-
-						if (path.extname(filePath) === '.js') {
-							route = new KoporeiRoute({
-								filePath,
-								path: routePath,
-								method: {
-									name: 'POST',
-									callback: require(filePath).default || require(filePath)
-								}
-							})
-						} else {
-							const search = preprocessors.filter(p => p.extension === path.extname(filePath).replace(/^\./g, ''));
-							route = new KoporeiRoute({
-								filePath,
-								path: routePath,
-								method: {
-									name: 'GET',
-									callback: () => {
-										const f = config.isSinglePage ?
-											path.join(process.cwd(), path.normalize(config.isSinglePage))
-											: filePath;
-										return fs.readFileSync(f).toString();
+								let route;
+	
+								let routePath = withoutExtension(
+									filePath.slice(configDir.length).replace(/\\/g, '/')
+								).replace(/(index)$/g, '');
+		
+								if (config.isLowerCase) routePath = routePath.toLowerCase();
+		
+								if (path.extname(filePath) === '.js') {
+									route = new KoporeiRoute({
+										filePath,
+										path: routePath,
+										method: {
+											name: 'POST',
+											callback: require(filePath).default || require(filePath)
+										}
+									})
+								} else {
+									const search = preprocessors.filter(p => p.extension === path.extname(filePath).replace(/^\./g, ''));
+									route = new KoporeiRoute({
+										filePath,
+										path: routePath,
+										method: {
+											name: 'GET',
+											callback: () => {
+												const f = config.isSinglePage ?
+													path.join(process.cwd(), path.normalize(config.isSinglePage))
+													: filePath;
+												return fs.readFileSync(f).toString();
+											}
+										}
+									})
+									if (search.length > 0) {
+										for (const cb of search) {
+											cb.transform(route, cb.options);
+										}
 									}
 								}
-							})
-							if (search.length > 0) {
-								for (const cb of search) {
-									cb.transform(route, cb.options);
+		
+								if (route) {
+									routes.push(route);
+									if (config.hooks && config.hooks.onRouteAdded) config.hooks.onRouteAdded(route);
 								}
+		
+							} else {
+								resolve(initRoute(configDir, filePath));
 							}
-						}
 
-						if (route) {
-							routes.push(route);
-							if (config.hooks && config.hooks.onRouteAdded) config.hooks.onRouteAdded(route);
-						}
-
-					} else {
-						resolve(initRoute(configDir, filePath));
+							if (hooks.onLoadEnd) hooks.onLoadEnd();
+							resolve();
+							
+						})
 					}
-				}
-				if (hooks.onLoadEnd) hooks.onLoadEnd();
-				resolve();
-			})
-		} else {
-			rejects('This path doesn\'t exist: ' + configDir);
-		}
+				})
+			} else {
+				rejects('This path doesn\'t exist: ' + configDir);
+			}
+		})
 	});
 }
 
