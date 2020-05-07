@@ -87,22 +87,22 @@ const options = {
     // An array of KoporeiPreprocessor
     // Executed when routes are loaded. Able you to compile specifics routes
     preprocessors: [{
-            extension: 'html',
-            transform: (route) => {
-                const fileContent = fs.readFileSync(route.filePath);
-                fs.writeFile(filePath, fileContent.replace(/World/g, 'Koporei Preprocessors'));
-            }
-        }]
+        extension: 'html',
+        transform: (route) => {
+            const fileContent = fs.readFileSync(route.filePath);
+            fs.writeFile(filePath, fileContent.replace(/World/g, 'Koporei Preprocessors'));
+        }
+    }]
 }
 ```
 
 **Hooks list**
 
 ```ts
-onLoadStart: () => void;
-onLoadEnd: () => void;
-onRouteAdded: (route: KoporeiRoute) => void;
-onExecute: (route: KoporeiRoute) => void;
+onLoadStart?: () => void;
+onLoadEnd?: () => void;
+onRouteAdded?: (route: KoporeiRoute) => void;
+onExecute?: (route: KoporeiRoute) => void;
 ```
 
 **Preprocessors**
