@@ -5,7 +5,7 @@ import IKoporeiConfig from '../src/koporei/KoporeiConfig';
 const app = new KoaApp();
 
 const options: IKoporeiConfig = {
-    pages: 'pages'
+    pages: 'tests/pages'
 }
 
 app.use(koa(options));
