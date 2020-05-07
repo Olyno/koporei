@@ -27,9 +27,11 @@ export async function initRoute(
 						
 						let route;
 
-						const routePath = withoutExtension(
+						let routePath = withoutExtension(
 							filePath.slice(configDir.length).replace(/\\/g, '/')
 						).replace(/(index)$/g, '');
+
+						if (config.isLowerCase) routePath = routePath.toLowerCase();
 
 						if (path.extname(filePath) === '.js') {
 							route = new KoporeiRoute({
@@ -48,7 +50,9 @@ export async function initRoute(
 								method: {
 									name: 'GET',
 									callback: () => {
-										const f = config.isSinglePage ? path.normalize(config.isSinglePage) : filePath;
+										const f = config.isSinglePage ?
+											path.join(process.cwd(), path.normalize(config.isSinglePage))
+											: filePath;
 										return fs.readFileSync(f).toString();
 									}
 								}
