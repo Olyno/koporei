@@ -40,7 +40,7 @@ import { express } from 'koporei';
 const app = ExpressApp();
 
 const options = {
-    pages: __dirname + '../src/pages'
+    pages: 'src/pages'
 }
 
 app.use(express(options));
@@ -57,7 +57,7 @@ import { koa } from 'koporei';
 const app = new KoaApp();
 
 const options = {
-    pages: __dirname + '../src/pages'
+    pages: 'src/pages'
 }
 
 app.use(koa(options));
@@ -65,27 +65,55 @@ app.use(koa(options));
 app.listen(3000);
 ```
 
-**Configuration:**
+### Configuration
 
 ```js
 const options = {
     // Where your pages are
-    pages: __dirname + '../src/pages',
+    pages: 'pages',
 
     // (optionnal) Make the path to lower case
     isLowerCase: true,
 
-    // /!\ EXPERIMENTAL /!\ (not implemented yet)
-    // (optionnal) If you use React, Vue, Svelte, or other tools like that.
-    // It will compile for you files. Just precise the function it must execute.
-    // code argument is the path to the file
-    preprocessor: (code) => require('@babel/core').transform(code, {
-        presets: ['@babel/preset-react'],
-    })
+    // (optionnal) If GET requests should return a specific page.
+    isSinglePage: 'public/index.html',
+
+    // (optionnal) Different hooks to use
+    hooks: {
+        onLoadEnd: () => console.log('Routes loaded')
+    },
+
+    // (optionnal) Preprocessors
+    // An array of KoporeiPreprocessor
+    // Executed when routes are loaded. Able you to compile specifics routes
+    preprocessors: [{
+            extension: 'html',
+            transform: (route) => {
+                const fileContent = fs.readFileSync(route.filePath);
+                fs.writeFile(filePath, fileContent.replace(/World/g, 'Koporei Preprocessors'));
+            }
+        }]
 }
 ```
 
-To know: koporei should support body of requests as POST requests.
+**Hooks list**
+
+```ts
+onLoadStart: () => void;
+onLoadEnd: () => void;
+onRouteAdded: (route: KoporeiRoute) => void;
+onExecute: (route: KoporeiRoute) => void;
+```
+
+**Preprocessors**
+
+```ts
+extension: string;
+options?: any[]; // You can pass any options in this array, and get them in the transform function
+transform: (route: KoporeiRoute, ...options) => void;
+```
+
+**To know:** koporei support POST requests.
 
 All html file are "GET" requests. But what about "POST" request? Easy to do:
 
@@ -96,12 +124,14 @@ exports.default = (ctx) => {
 }
 ```
 
+Need more example? Have a look into working examples in the ``tests`` directory!
+
+## Compatible Frameworks
+
 Depending your framework, you will get more informations as parameters:
 
-**Koa:** ctx, data
-**Express:** req, res, data
-
-Need more example? Have a look into working examples in the ``tests`` directory!
+ * **Koa:** ctx, next
+ * **Express:** req, res, next
 
 ## Contributing
 
