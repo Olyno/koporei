@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "prepare": "npm run build",
-    "build": "tsc",
+    "build": "rimraf dist && tsc",
     "dev": "nodemon --config nodemon/dev.json",
     "test": "nodemon --config nodemon/test.json"
   },
@@ -31,6 +31,7 @@
     "express": "^4.17.1",
     "koa": "^2.11.0",
     "nodemon": "^2.0.3",
+    "rimraf": "^3.0.2",
     "svelte": "^3.21.0",
     "ts-node": "^8.10.1",
     "typescript": "^3.8.3",
