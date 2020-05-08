@@ -1,8 +1,5 @@
 import IKoporeiPreprocessor from "../IKoporeiPreprocessor";
-import svelte from './svelte';
 
-const preprocessors: IKoporeiPreprocessor[] = [
-    svelte
-]
+const preprocessors: IKoporeiPreprocessor[] = []
 
-export { preprocessors, svelte };
+export { preprocessors };
