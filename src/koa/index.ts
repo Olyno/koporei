@@ -6,15 +6,12 @@ import { routes } from '../koporei/Koporei';
 export default (opts?: KoporeiConfig) => {
     Koporei(opts);
     return async (ctx: Context, next) => {
-        const result = routes.filter(route => 
-            route.path === ctx.url
-            && route.method.name === ctx.method.toUpperCase()
-        );
-        if (result.length > 0) {
+        const route = routes.get(`${ctx.method.toUpperCase()}|${ctx.url}`);
+        if (route) {
             if (ctx.method.toUpperCase() === 'GET') {
-                ctx.body = result[0].execute(ctx, next);
+                ctx.body = route.execute(ctx, next);
             } else if (ctx.method.toUpperCase() === 'POST') {
-                result[0].execute(ctx, next);
+                route.execute(ctx, next);
             }
         }
         return next();

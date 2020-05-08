@@ -4,7 +4,7 @@ import { error } from '../utils';
 import IKoporeiConfig from './KoporeiConfig';
 import KoporeiRoute from './KoporeiRoute';
 import { preprocessors } from './preprocessors';
-import KoporeiHooks from './KoporeiHooks';
+import IKoporeiHooks from './IKoporeiHooks';
 
 let config: IKoporeiConfig;
 
@@ -28,7 +28,7 @@ export async function initRoute(
 							if (err) return rejects(err);
 							if (stats.isFile()) {
 
-								let route;
+								let route: KoporeiRoute;
 	
 								let routePath = withoutExtension(
 									filePath.slice(configDir.length).replace(/\\/g, '/')
@@ -68,7 +68,7 @@ export async function initRoute(
 								}
 		
 								if (route) {
-									routes.push(route);
+									routes.set(`${route.method.name}|${route.path}`, route);
 									if (config.hooks && config.hooks.onRouteAdded) config.hooks.onRouteAdded(route);
 								}
 		
@@ -105,8 +105,9 @@ export default async function(opts?: IKoporeiConfig) {
 	}
 }
 
-export const routes: KoporeiRoute[] = [];
-export let hooks: KoporeiHooks = {
+export const routes: Map<string, KoporeiRoute> = new Map();
+
+export let hooks: IKoporeiHooks = {
 	onExecute: () => {},
 	onLoadStart: () => {},
 	onLoadEnd: () => {},
