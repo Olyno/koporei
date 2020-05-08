@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import path from 'path';
 import KoporeiRoute from '../KoporeiRoute';
-import KoporeiPreprocessor from '../KoporeiPreprocessor';
+import IKoporeiPreprocessor from '../IKoporeiPreprocessor';
 
 interface SvelteCompileOptions {
     filename?: string;
@@ -55,4 +55,4 @@ export default {
                 // fs.writeFile()
             })
     }
-} as KoporeiPreprocessor
+} as IKoporeiPreprocessor

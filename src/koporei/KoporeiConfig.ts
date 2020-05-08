@@ -1,10 +1,10 @@
-import KoporeiHooks from "./KoporeiHooks";
-import KoporeiPreprocessor from "./KoporeiPreprocessor";
+import IKoporeiHooks from "./IKoporeiHooks";
+import IKoporeiPreprocessor from "./IKoporeiPreprocessor";
 
 export default interface IKoporeiConfig {
     pages: string;
     isLowerCase?: boolean;
     isSinglePage?: string;
-    hooks?: KoporeiHooks;
-    preprocessors?: KoporeiPreprocessor[];
+    hooks?: IKoporeiHooks;
+    preprocessors?: IKoporeiPreprocessor[];
 }

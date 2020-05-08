@@ -1,7 +1,7 @@
-import KoporeiPreprocessor from "../KoporeiPreprocessor";
+import IKoporeiPreprocessor from "../IKoporeiPreprocessor";
 import svelte from './svelte';
 
-const preprocessors: KoporeiPreprocessor[] = [
+const preprocessors: IKoporeiPreprocessor[] = [
     svelte
 ]
 
